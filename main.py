@@ -13,7 +13,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
-    def do_GET(self):
+    def do_POST(self):
         if self.path == '/webhook':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
