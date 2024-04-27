@@ -14,43 +14,55 @@ class WebhookHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        if self.path == '/webhook':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            print(post_data)
-            logger.info(post_data)
-            data = json.loads(post_data.decode('utf-8'))
+        try:
+            if self.path == '/webhook':
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                logger.info(post_data)
 
-            event_type = data.get('event', '')
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                except json.decoder.JSONDecodeError as e:
+                    logger.error(f'Error decoding JSON: {e}')
+                    self.send_response(400)
+                    self.end_headers()
+                    return
 
-            if event_type == 'ONCRMCONTACTADD':
-                contact_id = data.get('data').get('FIELDS').get('ID')
-                contact_name = data.get('data').get('FIELDS').get('NAME')
+                event_type = data.get('event', '')
 
-                logger.info(f'Received webhook for new contact id={contact_id} with name "{contact_name}"')
+                if event_type == 'ONCRMCONTACTADD':
+                    contact_data = data.get('data', {}).get('FIELDS', {})
+                    contact_id = contact_data.get('ID')
+                    contact_name = contact_data.get('NAME')
 
-                gender_from_db = check_name(contact_name)
+                    logger.info(f'Received webhook for new contact id={contact_id} with name "{contact_name}"')
 
-                if gender_from_db == 1 or gender_from_db == 0:
-                    if edit_contact_sex_by_id(contact_id, gender_from_db):
-                        self._set_headers()
-                        self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
+                    gender_from_db = check_name(contact_name)
+
+                    if gender_from_db in [0, 1]:
+                        if edit_contact_sex_by_id(contact_id, gender_from_db):
+                            self._set_headers()
+                            self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
+                        else:
+                            self.send_response(500)
+                            self.end_headers()
+                            self.wfile.write(json.dumps({'status': 'internal error'}).encode('utf-8'))
                     else:
-                        self.send_response(500)
-                        self.end_headers()
-                        self.wfile.write(json.dumps({'status': 'internal error'}).encode('utf-8'))
-                else:
-                    self._set_headers()
-                    self.wfile.write(
-                        json.dumps({'status': f'name {contact_name} wasnt find in database'}).encode('utf-8'))
-                    logger.warning(f'Name "{contact_name}" didnt exist in database')
+                        self._set_headers()
+                        self.wfile.write(
+                            json.dumps({'status': f'name {contact_name} wasnt found in database'}).encode('utf-8'))
+                        logger.warning(f'Name "{contact_name}" not found in database')
 
+                else:
+                    self.send_response(405)
+                    self.end_headers()
+                    self.wfile.write(json.dumps({'message': 'unsupported event'}).encode('utf-8'))
             else:
-                self.send_response(405)
+                self.send_response(404)
                 self.end_headers()
-                self.wfile.write(json.dumps({'message': 'unsupported event'}).encode('utf-8'))
-        else:
-            self.send_response(404)
+        except Exception as e:
+            logger.error(f'Error processing request: {e}')
+            self.send_response(500)
             self.end_headers()
 
 
