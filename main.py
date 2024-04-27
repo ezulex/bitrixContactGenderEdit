@@ -16,6 +16,8 @@ class WebhookHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             if self.path == '/webhook':
+                logger.info(self.request)
+                logger.info(self.rfile)
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 logger.info(post_data)
