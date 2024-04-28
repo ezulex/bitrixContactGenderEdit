@@ -49,7 +49,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 if event_type == 'ONCRMCONTACTADD':
                     # contact_data = data.get('data', {}).get('FIELDS', {})
                     # contact_id = contact_data.get('ID')
-                    # # contact_name = contact_data.get('NAME')
+                    #contact_name = contact_data.get('NAME')
                     contact_id = params.get("data[FIELDS][ID]", [None])[0]
                     contact_name = get_contact_name_by_id(contact_id)
 
