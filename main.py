@@ -1,6 +1,6 @@
 import app_logger
 from database_connection import check_name
-from outgoing_webhooks import edit_contact_sex_by_id
+from outgoing_webhooks import edit_contact_sex_by_id, get_contact_name_by_id
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 
@@ -36,7 +36,8 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 if event_type == 'ONCRMCONTACTADD':
                     contact_data = data.get('data', {}).get('FIELDS', {})
                     contact_id = contact_data.get('ID')
-                    contact_name = contact_data.get('NAME')
+                    # contact_name = contact_data.get('NAME')
+                    contact_name = get_contact_name_by_id(contact_id)
 
                     logger.info(f'Received webhook for new contact id={contact_id} with name "{contact_name}"')
 
