@@ -18,6 +18,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
             if self.path == '/webhook':
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
+                logger.info(post_data)
 
                 try:
                     data = json.loads(post_data)
