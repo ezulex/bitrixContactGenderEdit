@@ -35,13 +35,13 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 logger.info(params)
                 logger.info(data)
 
-                try:
-                    data = json.loads(post_data)
-                except json.decoder.JSONDecodeError as e:
-                    logger.error(f'Error decoding JSON: {e}')
-                    self.send_response(400)
-                    self.end_headers()
-                    return
+                # try:
+                #     data = json.loads(post_data)
+                # except json.decoder.JSONDecodeError as e:
+                #     logger.error(f'Error decoding JSON: {e}')
+                #     self.send_response(400)
+                #     self.end_headers()
+                #     return
 
                 # event_type = data.get('event', '')
                 event_type = params.get("event", [None])[0]
