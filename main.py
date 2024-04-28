@@ -20,7 +20,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 post_data = self.rfile.read(content_length)
 
                 try:
-                    data = json.loads(post_data.decode('utf-8'))
+                    data = json.loads(post_data)
                 except json.decoder.JSONDecodeError as e:
                     logger.error(f'Error decoding JSON: {e}')
                     self.send_response(400)
