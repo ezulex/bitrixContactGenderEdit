@@ -1,3 +1,4 @@
+from urllib.parse import parse_qs
 import app_logger
 from database_connection import check_name
 from outgoing_webhooks import edit_contact_sex_by_id, get_contact_name_by_id
@@ -18,7 +19,21 @@ class WebhookHandler(BaseHTTPRequestHandler):
             if self.path == '/webhook':
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
+                params = parse_qs(post_data.decode('utf-8'))
+
+                data = {
+                    "event": params.get("event", [None])[0],
+                    "data": {
+                        "FIELDS": {
+                            "ID": params.get("data[FIELDS][ID]", [None])[0]
+                            # Добавьте другие поля, если они присутствуют
+                        }
+                    }
+                }
+
                 logger.info(post_data)
+                logger.info(params)
+                logger.info(data)
 
                 try:
                     data = json.loads(post_data)
