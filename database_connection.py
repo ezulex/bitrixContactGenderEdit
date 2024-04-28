@@ -12,6 +12,7 @@ def check_name(contact_name):
         This function check name in database
         contact_name: string, name for checking in database
     """
+    contact_name = contact_name.capitalize()
     try:
         connection = psycopg2.connect(
             user=os.environ.get("DB_USER"),
