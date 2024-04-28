@@ -26,7 +26,7 @@ def get_contact_name_by_id(contact_id):
         response_webhook.raise_for_status()
         response_json = response_webhook.json()
         response = response_json["result"]["NAME"]
-        logger.info(f'webhook get_contact_name_by_id: {response}')
+        logger.info(f'Webhook get_contact_name_by_id for name: {response}')
         return response
     except requests.exceptions.RequestException as error:
         logger.error(f"Error with webhook get_contact_name_by_id: {error}")
@@ -59,7 +59,7 @@ def edit_contact_sex_by_id(contact_id, contact_sex):
         response_webhook.raise_for_status()
         response_json = response_webhook.json()
         response = response_json["result"]
-        logger.info(f'webhook edit_contact_sex_by_id: {response_webhook.status_code}')
+        logger.info(f'webhook edit_contact_sex_by_id status: {response_webhook.status_code}')
         return response
     except requests.exceptions.RequestException as error:
         logger.error(f"Error with webhook edit_contact_sex_by_id: {error}")

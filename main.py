@@ -20,36 +20,10 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 params = parse_qs(post_data.decode('utf-8'))
-
-                data = {
-                    "event": params.get("event", [None])[0],
-                    "data": {
-                        "FIELDS": {
-                            "ID": params.get("data[FIELDS][ID]", [None])[0]
-                            # Добавьте другие поля, если они присутствуют
-                        }
-                    }
-                }
-
-                logger.info(post_data)
-                logger.info(params)
-                logger.info(data)
-
-                # try:
-                #     data = json.loads(post_data)
-                # except json.decoder.JSONDecodeError as e:
-                #     logger.error(f'Error decoding JSON: {e}')
-                #     self.send_response(400)
-                #     self.end_headers()
-                #     return
-
-                # event_type = data.get('event', '')
+                logger.info(f'Received new event with params:{params}')
                 event_type = params.get("event", [None])[0]
 
                 if event_type == 'ONCRMCONTACTADD':
-                    # contact_data = data.get('data', {}).get('FIELDS', {})
-                    # contact_id = contact_data.get('ID')
-                    #contact_name = contact_data.get('NAME')
                     contact_id = params.get("data[FIELDS][ID]", [None])[0]
                     contact_name = get_contact_name_by_id(contact_id)
 
