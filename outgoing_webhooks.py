@@ -9,6 +9,9 @@ load_dotenv()
 domain = os.environ.get("BITRIX_DOMAIN")
 user_id = os.environ.get("BITRIX_USER_ID")
 auth_key = os.environ.get("BITRIX_AUTH_KEY")
+area_id = os.environ.get("BITRIX_AREA_ID")
+area_man = os.environ.get("BITRIX_AREA_MAN")
+area_woman = os.environ.get("BITRIX_AREA_WOMAN")
 
 
 def get_contact_name_by_id(contact_id):
@@ -41,16 +44,16 @@ def edit_contact_sex_by_id(contact_id, contact_sex):
     webhook_url = f'https://{domain}.bitrix24.ru/rest/{user_id}/{auth_key}/crm.contact.update.json'
 
     if contact_sex == 1:
-        contact_sex_id = 45
+        contact_sex_id = area_man
     elif contact_sex == 0:
-        contact_sex_id = 47
+        contact_sex_id = area_woman
     else:
         logger.error(f"Wrong params for edit_contact_sex_by_id")
         return False
     data = {
         'id': contact_id,
         "fields": {
-            "UF_CRM_1713965966244": contact_sex_id
+            area_id: contact_sex_id
         }
     }
 
